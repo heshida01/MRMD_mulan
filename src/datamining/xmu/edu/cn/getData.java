@@ -74,6 +74,7 @@ public class getData implements Runnable
 				for(int col = 0; col < dataString.length; ++ col)
 				{
 					data[row][col] = dataString[col];
+					//System.out.println("data= {" +data[row][col]+"}");
 				}
 				InputLine = InputBR.readLine();
 				line ++;

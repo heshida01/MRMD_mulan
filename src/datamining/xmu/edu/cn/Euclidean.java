@@ -73,6 +73,8 @@ public class Euclidean implements Runnable
 		}
 		data = null;
 		EuclideanData = null;
+//		for(double i : EuclideanValue)
+//			System.out.println(i);
 		System.out.println("Calculating Euclidean Distance over!!!");
 	//	return EuclideanValue;
 	}

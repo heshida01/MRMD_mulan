@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python">
+      <configuration sdkName="Python 2.7" />
+    </facet>
+  </component>
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/bin" />
     <exclude-output />
@@ -44,5 +49,24 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="file://$USER_HOME$/Downloads/jython-installer-2.7.0-master" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/Downloads/jython-installer-2.7.0-master" />
+        </SOURCES>
+        <jarDirectory url="file://$USER_HOME$/Downloads/jython-installer-2.7.0-master" recursive="false" />
+        <jarDirectory url="file://$USER_HOME$/Downloads/jython-installer-2.7.0-master" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="jython-installer-2.7.0" level="project" />
+    <orderEntry type="library" name="jython" level="project" />
+    <orderEntry type="library" name="Python 2.7 interpreter library" level="application" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="renderExternalDocumentation" value="true" />
   </component>
 </module>

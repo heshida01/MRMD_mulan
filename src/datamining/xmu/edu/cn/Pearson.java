@@ -1,5 +1,7 @@
 package datamining.xmu.edu.cn;
 
+import sun.text.resources.cldr.bn.FormatData_bn_IN;
+
 public class Pearson implements Runnable
 {
 	private  int insNum;
@@ -55,6 +57,7 @@ public class Pearson implements Runnable
 			if(data[i][col].equals("?"))
 			{
 				num --;
+				System.out.println("???");
 				continue;
 			}
 			//System.out.println("6666");
@@ -89,7 +92,7 @@ public class Pearson implements Runnable
 		
 	
 		
-		for(int i = 0; i < feaNum; ++ i)
+		for(int i = 0; i < feaNum; ++ i)   //20
 		{
 			//double r = 0;
 //			int k = 0;
@@ -97,7 +100,8 @@ public class Pearson implements Runnable
 			{
 				//System.out.println( average(data, i));
 				//System.out.println( average(data, j));
-			//	System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!55555555555");
+			 //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!55555555555");
+
 				double average1 = average(inputData, i);
 			  //  System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				double average2 = average(inputData, j);
@@ -106,7 +110,6 @@ public class Pearson implements Runnable
 				if(Math.abs(denominator) < (1E-10))
 				{
 					this.PearsonData[i][j - feaNum] = 0.0;
-					continue;
 				}
 				this.PearsonData[i][j - feaNum] = Math.abs(numerator/denominator);
 				//System.out.println(PearsonValue[i][k]);
@@ -125,6 +128,9 @@ public class Pearson implements Runnable
 		}
 		PearsonData = null;
 		inputData = null;
+		System.out.println("Calculating Pearson's correlation coefficient over!!!");
+
+
 		System.out.println("Calculating Pearson's correlation coefficient over!!!");
 		//return PearsonValue;
 	}
