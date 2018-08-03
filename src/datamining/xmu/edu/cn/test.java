@@ -102,7 +102,7 @@ public class test {
 			bw.write("-----------------------------------"+"arff文件"+"的结果---------------------------------\r\n");
 
 			// load unlabeled data
-			Instances data = new Instances(new BufferedReader(new FileReader("188D.arff")));
+			Instances data = new Instances(new BufferedReader(new FileReader("20D.arff")));
 
 			// set class attribute
 			data.setClassIndex(data.numAttributes() - 1);
@@ -147,7 +147,10 @@ public class test {
 			System.out.println(evalAll.toMatrixString("=== Confusion matrix for 10-fold "  + " ===\n"));
 			System.out.println(evalAll.toClassDetailsString());
 		    System.out.println(evalAll.pctCorrect());
+			System.out.println(evalAll.fMeasure(0));
+		    System.out.println(evalAll.fMeasure(1));
 
+		evalAll.weightedFMeasure();
 //		}
 		bw.flush();
 		bw.close();

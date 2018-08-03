@@ -29,6 +29,7 @@ public class MRMD_mulan implements Runnable {
     static Calendar calendar = Calendar.getInstance();
     static int minutes = calendar.get(Calendar.MINUTE);
     static String arff = "out_"+ String.valueOf(minutes)+"."+"arff";
+    static String csv="out_"+String.valueOf(minutes)+".csv";
     static int insNum = 0;
     static int feaNum = 0;
     static int labNum = 1;
@@ -45,6 +46,7 @@ public class MRMD_mulan implements Runnable {
     private static Queue<String> list;     //storage temp file
     private static int np=1;      //num threading
     private static ConcurrentLinkedQueue<Integer> concurrentLinkedQueue;
+    private static ConcurrentLinkedQueue<String> concurrentLinkedQueueF1;
     public static void main(String[] args) throws Exception {
         // TODO Auto-generated method stub
         // 测试命令
@@ -64,7 +66,7 @@ public class MRMD_mulan implements Runnable {
         options.addOption("N", "No", false, "auto select" );
         options.addOption("sn", "sn", true, "select feature number");
         options.addOption("t", "thds", true, "the number of threadings");
-
+        options.addOption("c", "csv", true, "make features'rate and f1 score into a csv file");
         // Parse the program arguments
         CommandLine commandLine = parser.parse( options, args );
 
@@ -116,6 +118,9 @@ public class MRMD_mulan implements Runnable {
 
         if(commandLine.hasOption("t")){
             np=Integer.parseInt(commandLine.getOptionValue("t"));
+        }
+        if(commandLine.hasOption("c")){
+            csv=commandLine.getOptionValue("c");
         }
 
         File InputFile = new File(inputFile);
@@ -199,7 +204,7 @@ public class MRMD_mulan implements Runnable {
         gfd.setLabNum(labNum);
         exec.execute(gfd);
 
-        //gfd.run();
+
 
 
         exec.shutdown();
@@ -213,7 +218,7 @@ public class MRMD_mulan implements Runnable {
         cd.setFeaNum(feaNum);
         cd.setInsNum(insNum);
         cd.setLabNum(labNum);
-//		cd.run();
+
 
         double[] EuclideanValue = new double[feaNum];
         Euclidean ed = new Euclidean(feaNum);
@@ -362,6 +367,7 @@ public class MRMD_mulan implements Runnable {
         System.out.println("model:"+model);
 
         if(isAuto){
+            concurrentLinkedQueueF1 = new ConcurrentLinkedQueue<String>();
             int num = optSelect();
             writeFeature(num,arff);
             System.out.println();
@@ -370,8 +376,32 @@ public class MRMD_mulan implements Runnable {
             System.out.println("Feature selction optimation end,the best arff save "+arff);
         }
 
+        List<String> list1=new ArrayList<String>() ;
+        // Collections.sort(concurrentLinkedQueueF1);
+        for (String s:concurrentLinkedQueueF1){
+            list1.add(s);
+        }
+        Collections.sort(list1, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String num1=o1.split(" ")[2];
+                String num2=o2.split(" ")[2];
+                //System.out.println("num1="+num1);
+                //System.out.println("num2="+num2);
+                if(Double.parseDouble(num1)>Double.parseDouble(num2)){
+                    return 1;
+                }
+                else if(Double.parseDouble(num1)==Double.parseDouble(num2)){
+                    return 0;
+                }
+                else
+                    return  -1;
+            }
+        });
 
 
+
+        writeCSV(list1,csv);
         for (String temp_file:list) {
             File del_file = new File(temp_file);
             Thread.sleep(100);
@@ -393,8 +423,23 @@ public class MRMD_mulan implements Runnable {
 
 
     }
-
-
+    // feature num: 1 rate: 0.5443833464257659 ,f1weight: 0.5453777681563947
+    public static void writeCSV(List<String> list,String csv) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csv, false)));
+        String strhead="features"+","+"accuracy"+","+"F1\n";
+        bufferedWriter.write(strhead);
+        int i=1;
+        for(String s:list){
+            String Srate=s.split(" ")[4];
+            String String_F1=s.split(":")[3];
+            //System.out.println(String_F1);
+            String strcontent="feature num"+Integer.toString(i)+","+Srate+","+String_F1+"\n";
+            bufferedWriter.write(strcontent);
+            i+=1;
+        }
+        bufferedWriter.close();
+        System.out.println(csv+" file is finished!!!");
+    }
 
     public static void print_help(){
         System.out.println("Usage: java -jar MRMD.jar" +
@@ -529,7 +574,7 @@ public class MRMD_mulan implements Runnable {
 
 
 
-    public static double featureRate(String myarff) throws Exception{
+    public static double[] featureRate(String myarff) throws Exception{
         int folds=10;
 
         Classifier cls1 =getClassifier(model);
@@ -564,10 +609,11 @@ public class MRMD_mulan implements Runnable {
 
 
         }
+        double [] data1 = new double[2];
+        data1[0]=evalAll.pctCorrect();
+        data1[1]=evalAll.weightedFMeasure();
 
-
-
-     return evalAll.pctCorrect();
+     return data1;
     }
 
     public static List initialHashMap(double data[], int feaNum)
@@ -604,7 +650,7 @@ public class MRMD_mulan implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run()  {
         double temp = 0;
 
         String myarff;
@@ -619,8 +665,12 @@ public class MRMD_mulan implements Runnable {
             try {
 
                 writeFeature(i,myarff);
-                temp=featureRate(myarff);
-                //System.out.println(T1+" feature num: "+i+" rate: "+temp);
+                double [] data1 = new double[2];
+                data1=featureRate(myarff);
+                temp=data1[0];
+                String s=("feature num: "+i+" rate: "+temp/100+" ,f1weight:"+data1[1]);
+
+                concurrentLinkedQueueF1.add(s);
                 countper();
                 if(count<=seleFeaNum)
                     System.out.printf("\rcompleted: %3d/%d",count,seleFeaNum);  //自动优化进度
@@ -664,6 +714,7 @@ public class MRMD_mulan implements Runnable {
     }
     public static  void init_queue(){
        concurrentLinkedQueue = new ConcurrentLinkedQueue<Integer>();
+
         for (int i = 1; i <= seleFeaNum; i++) {
             concurrentLinkedQueue.add(i);
         }
